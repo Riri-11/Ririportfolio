@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riri's Elegant Vision: Multifaceted Portfolio</title>
+    
+    <!-- Tailwind CSS for Layout & Aesthetics -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Elegant and Curvy for Logo/Headings, Serif for Body -->
+    <link href="https://fonts.googleapis.com/css2?family=Rouge+Script&family=Cormorant+Garamond:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js Library for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    
+    <style>
+        /* Configure Tailwind to use the elegant fonts */
+        html {
+            font-family: 'Cormorant Garamond', serif; 
+        }
+
+        /* Base Styling: Luxurious Dark Theme */
+        body {
+            background-color: #0A0A10; /* Deep Charcoal Black */
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        /* UI OVERLAY FIX: Ensure 2D content scrolls over the fixed 3D background */
+        #ui-overlay {
+            position: relative;
+            z-index: 10; /* CRITICAL: Must be higher than the 3D canvas (z-index 1) */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            padding-top: 5rem; /* Space for the fixed header */
+        }
+        
+        /* 3D Canvas Positioning (Fixed in the background) - MAJOR FIX HERE */
+        canvas { 
+            display: block; 
+            position: fixed; /* Keep it fixed in the viewport */
+            top: 0;
+            left: 0;
+            z-index: 1; /* CRITICAL: Must be lower than the UI overlay */
+            /* Ensure it covers the whole screen */
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* Custom Elegant Glass Card Style */
+        .glass-card {
+            background: rgba(40, 40, 50, 0.7); 
+            backdrop-filter: blur(14px); 
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(212, 175, 55, 0.4); 
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+            transition: all 0.5s;
+        }
+
+        /* Unique Logo Style - Using the curvy font */
+        .riri-logo {
+            font-family: 'Rouge Script', cursive;
+            font-weight: 400;
+            letter-spacing: 0.1em; 
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.7), 0 0 5px rgba(255, 255, 255, 0.3); 
+            cursor: pointer;
+        }
+
+        /* Heading Style - Using the elegant body font */
+        .elegant-heading {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+        }
+        
+        /* Navbar Links */
+        .nav-link {
+            transition: all 0.3s;
+            cursor: pointer;
+            color: #F8F8F8;
+            padding: 0.5rem 0.75rem; 
+        }
+        .nav-link:hover {
+            color: #D4AF37; 
+            transform: translateY(-2px);
+        }
+        .nav-link.active {
+            border-bottom: 3px solid #D4AF37; 
+            color: #D4AF37;
+        }
+
+        /* Project Placeholder Card (More distinct styling) */
+        .project-placeholder-img {
+            aspect-ratio: 4/3; 
+            background-color: #0d0d15; /* Even darker background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #D4AF37;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px dashed #D4AF3788; /* Thicker dashed border */
+            box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Skills Tag Hover effect */
+        .skill-tag:hover {
+             background-color: #D4AF37 !important;
+             color: #0A0A10 !important;
+             transform: translateY(-2px);
+             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+             cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- UI OVERLAY (The 2D Content) -->
+    <div id="ui-overlay" class="text-white">
+
+        <!-- Fixed Header & Navigation -->
+        <header class="glass-card w-full fixed top-0 left-0 z-50 p-4">
+            <nav class="max-w-7xl mx-auto">
+                <!-- Top Row: Logo & Menu Button -->
+                <div class="flex justify-between items-center">
+                    <!-- Unique Logo (Left Corner) - Elegant Font Applied Here -->
+                    <!-- The Psi symbol (&#936;) is correctly rendering the symbol -->
+                    <div class="riri-logo text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500" onclick="navigateTo('home')">
+                        Riri | <span class="text-yellow-500 font-serif text-3xl md:text-4xl">&#936;</span> 
+                    </div>
+
+                    <!-- Desktop Links (Hidden on Mobile) -->
+                    <div id="desktop-nav" class="hidden md:flex flex-wrap justify-end gap-6 font-medium text-base">
+                        <button class="nav-link" onclick="navigateTo('about')"><i class="fa-solid fa-user-tie mr-1"></i> About</button>
+                        <button class="nav-link" onclick="navigateTo('projects')"><i class="fa-solid fa-layer-group mr-1"></i> Projects</button>
+                        <button class="nav-link" onclick="navigateTo('skills')"><i class="fa-solid fa-brain mr-1"></i> Skills</button>
+                        <button class="nav-link" onclick="navigateTo('blog')"><i class="fa-solid fa-feather-pointed mr-1"></i> Blog</button>
+                        <button class="nav-link" onclick="navigateTo('contact')"><i class="fa-solid fa-handshake mr-1"></i> Contact</button>
+                    </div>
+
+                    <!-- Mobile Menu Toggle Button -->
+                    <button id="menu-toggle" class="md:hidden text-2xl text-yellow-400 p-2 rounded-full hover:bg-gray-800 transition">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+                
+                <!-- Mobile Dropdown Navigation -->
+                <div id="mobile-nav-links" class="md:hidden mt-4 hidden flex flex-col items-center gap-2 border-t border-gray-700 pt-3">
+                    <button class="nav-link w-full text-center" onclick="navigateTo('about')"><i class="fa-solid fa-user-tie mr-2"></i> About</button>
+                    <button class="nav-link w-full text-center" onclick="navigateTo('projects')"><i class="fa-solid fa-layer-group mr-2"></i> Projects</button>
+                    <button class="nav-link" onclick="navigateTo('skills')"><i class="fa-solid fa-brain mr-2"></i> Skills</button>
+                    <button class="nav-link" onclick="navigateTo('blog')"><i class="fa-solid fa-feather-pointed mr-2"></i> Blog</button>
+                    <button class="nav-link w-full text-center" onclick="navigateTo('contact')"><i class="fa-solid fa-handshake mr-2"></i> Contact</button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <main id="content-area" class="w-full max-w-7xl mx-auto p-4 md:p-8 flex-grow">
+            <!-- Content will be injected here by JavaScript -->
+        </main>
+        
+        <!-- Footer -->
+        <footer class="w-full text-center mt-10 p-4 text-gray-500 text-xs">
+            © 2025 Riri's Dynamic Prism. Crafted with Code.
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT: Logic and 3D Rendering -->
+    <script>
+        // --- 3D GLOBAL VARIABLES ---
+        let scene, camera, renderer, prism;
+        let mouseX = 0, mouseY = 0;
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
+        let clock = new THREE.Clock(); // For time-based animation
+
+        // --- UI STATE VARIABLES ---
+        let currentPage = 'home';
+        const contentArea = document.getElementById('content-area');
+        const navButtons = document.querySelectorAll('.nav-link');
+        const mobileNavLinks = document.getElementById('mobile-nav-links');
+        const menuToggle = document.getElementById('menu-toggle');
+
+        // ===============================================
+        // 1. NAVIGATION & STATE MANAGEMENT
+        // ===============================================
+
+        // Event listener for mobile menu toggle
+        menuToggle.addEventListener('click', () => {
+            mobileNavLinks.classList.toggle('hidden');
+        });
+
+        function navigateTo(page) {
+            currentPage = page;
+            
+            // 1. Update Navigation Buttons 
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll(`.nav-link[onclick*='${page}']`).forEach(btn => btn.classList.add('active'));
+
+            // Hide mobile menu after clicking a link
+            mobileNavLinks.classList.add('hidden');
+
+            // 2. Render new Content
+            renderContent(page);
+
+            // 3. Update 3D Model Visibility (Only show on Home/About)
+            if (renderer && renderer.domElement) {
+                // Control its display: block for home/about, none otherwise
+                renderer.domElement.style.display = (page === 'home' || page === 'about') ? 'block' : 'none';
+            }
+        }
+
+        function renderContent(page) {
+            let htmlContent = '';
+            
+            // Placeholder function for images (using text only now)
+            const imagePlaceholder = (title, subtitle) => `
+                <div class="project-placeholder-img">
+                    <div class="text-center">
+                        <p class="font-bold text-lg">${title}</p>
+                        <p class="text-sm text-gray-400 mt-1">${subtitle}</p>
+                    </div>
+                </div>
+            `;
+
+            switch (page) {
+                case 'home':
+                    htmlContent = `
+                        <div class="flex flex-col items-center text-center pt-16 md:pt-32">
+                            <h2 class="elegant-heading text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500 mb-4 tracking-tight">The Art of Intersection</h2>
+                            <p class="text-lg md:text-2xl font-light text-gray-300 mb-8 max-w-3xl">Architectural Technologist. Design Strategist. A Multitasking Visionary focused on structure, aesthetics, and viability.</p>
+                        </div>
+                    `;
+                    break;
+                case 'about':
+                    htmlContent = `
+                        <div class="glass-card rounded-xl p-6 md:p-10 w-full max-w-5xl mx-auto space-y-8">
+                            <h2 class="elegant-heading text-4xl font-bold text-yellow-300 border-b border-gray-700 pb-2">The Pursuit of Blended Excellence</h2>
+                            
+                            <!-- Introduction Section -->
+                            <div class="flex flex-col md:flex-row gap-6 items-center">
+                                <div class="md:w-2/3 space-y-4">
+                                    <p class="text-gray-300 text-lg">
+                                        I am a high school student navigating five simultaneous worlds—Architecture, Interior Design, Business Management, Web Development, and Islamic Law. My drive is not merely to study these fields in isolation, but to **master the connections** between them. 
+                                    </p>
+                                    <p class="text-gray-400 italic">
+                                        I see a building not just as a structure, but as a **financial asset** that must be **ethically sound** and designed with an **intuitive digital interface**. My passion is creating elegant, sustainable, and functional ecosystems, from a physical structure to a responsive codebase.
+                                    </p>
+                                </div>
+                                <!-- Aesthetic Placeholder (No external image) -->
+                                <div class="md:w-1/3 flex justify-center items-center">
+                                    <div class="w-40 h-40 md:w-64 md:h-64 rounded-xl border-4 border-yellow-500/30 shadow-2xl transition hover:shadow-yellow-500/20 bg-gray-900 flex items-center justify-center text-center text-sm font-semibold text-yellow-500">
+                                        <p>RIHANA CREATIVE PORTRAIT</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Domains -->
+                            <h3 class="elegant-heading text-2xl font-bold text-yellow-300 pt-4 border-t border-gray-800">My Domains of Focus:</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                <div class="p-4 bg-gray-800/50 rounded-lg shadow-md"><i class="fa-solid fa-ruler-combined text-3xl text-yellow-400"></i><p class="text-sm mt-2">Architectural Tech</p></div>
+                                <div class="p-4 bg-gray-800/50 rounded-lg shadow-md"><i class="fa-solid fa-chart-bar text-3xl text-yellow-400"></i><p class="text-sm mt-2">Business Strategy</p></div>
+                                <div class="p-4 bg-gray-800/50 rounded-lg shadow-md"><i class="fa-solid fa-laptop-code text-3xl text-yellow-400"></i><p class="text-sm mt-2">Web Design</p></div>
+                                <div class="p-4 bg-gray-800/50 rounded-lg shadow-md"><i class="fa-solid fa-microchip text-3xl text-yellow-400"></i><p class="text-sm mt-2">Tech Prototyping</p></div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'projects':
+                    htmlContent = `
+                        <div class="glass-card rounded-xl p-6 md:p-10 w-full max-w-6xl mx-auto">
+                            <h2 class="elegant-heading text-4xl font-bold text-yellow-300 border-b border-gray-700 pb-2 mb-6">Master Works Portfolio</h2>
+                            <div id="project-filter-buttons" class="flex flex-wrap gap-3 mb-6">
+                                <button class="filter-btn text-sm p-2 px-4 rounded-full bg-yellow-600 text-black font-semibold" data-filter="All">All Domains</button>
+                                <button class="filter-btn text-sm p-2 px-4 rounded-full bg-gray-700 hover:bg-yellow-700 transition" data-filter="Architecture">Architecture</button>
+                                <button class="filter-btn text-sm p-2 px-4 rounded-full bg-gray-700 hover:bg-yellow-700 transition" data-filter="Interior">Interior Design</button>
+                                <button class="filter-btn text-sm p-2 px-4 rounded-full bg-gray-700 hover:bg-yellow-700 transition" data-filter="Web">Web Design</button>
+                                <button class="filter-btn text-sm p-2 px-4 rounded-full bg-gray-700 hover:bg-yellow-700 transition" data-filter="Tech">Arduino/Tech</button>
+                            </div>
+                            
+                            <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                
+                                <!-- Project 1 - Placeholder image is robust -->
+                                <div class="project-item bg-gray-900/50 p-4 rounded-xl space-y-2 border border-gray-700 hover:border-yellow-500 transition" data-domain="Architecture">
+                                    <img src=“https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbYTj-INk9C27NG6tfXJJHin9it5g6au05ImnuUnoIFQ&s=10”>
+
+${imagePlaceholder("Modern Facade Concept", "Focus on fluid forms and material layering.")}
+                                    <h3 class="font-bold text-lg text-yellow-400">Parametric Residential Concept</h3>
+                                    <p class="text-sm text-gray-400">Conceptual study using algorithmic design for sustainable housing.</p>
+                                </div>
+                                
+                                <!-- Project 2 - Placeholder image is robust -->
+                                <div class="project-item bg-gray-900/50 p-4 rounded-xl space-y-2 border border-gray-700 hover:border-yellow-500 transition" data-domain="Interior">
+                                    ${imagePlaceholder("The Atrium of Light", "Mastering natural light optimization.")}
+                                    <h3 class="font-bold text-lg text-yellow-400">Minimalist Luxury Interior</h3>
+                                    <p class="text-sm text-gray-400">Focus on seamless flow and bespoke furnishing arrangement.</p>
+                                </div>
+
+                                <!-- Project 3 - Placeholder image is robust -->
+                                <div class="project-item bg-gray-900/50 p-4 rounded-xl space-y-2 border border-gray-700 hover:border-yellow-500 transition" data-domain="Web">
+                                    ${imagePlaceholder("Dynamic UI Framework", "Responsive dashboard using modern JS.")}
+                                    <h3 class="font-bold text-lg text-yellow-400">Responsive Trading Dashboard</h3>
+                                    <p class="text-sm text-gray-400">A high-fidelity prototype for financial data visualization.</p>
+                                </div>
+
+                                <!-- Project 4 - Placeholder image is robust -->
+                                <div class="project-item bg-gray-900/50 p-4 rounded-xl space-y-2 border border-gray-700 hover:border-yellow-500 transition" data-domain="Tech">
+                                    ${imagePlaceholder("Automated Climate Controller", "Arduino prototype for self-regulating environments.")}
+                                    <h3 class="font-bold text-lg text-yellow-400">Smart Eco-Sensor System</h3>
+                                    <p class="text-sm text-gray-400">Integrating sensors for optimal, low-power environment control.</p>
+                                </div>
+                                
+                                <!-- Ethical Foundation Note -->
+                                <div class="bg-yellow-900/30 p-4 rounded-xl space-y-2 lg:col-span-3 text-center">
+                                    <p class="text-sm text-yellow-300 italic"><i class="fa-solid fa-book-quran mr-2"></i> **Ethical Foundation:** My current academic focus includes foundational Islamic Law (Fiqh) to inform ethical decision-making in all design and business projects.</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'skills':
+                    htmlContent = `
+                        <div class="glass-card rounded-xl p-6 md:p-10 w-full max-w-5xl mx-auto text-center">
+                            <h2 class="elegant-heading text-4xl font-bold text-yellow-300 border-b border-gray-700 pb-2 mb-8">Interactive Skill Matrix</h2>
+                            <p class="text-lg mb-8 text-gray-300">Hover or tap the domains below to reveal detailed proficiencies.</p>
+
+                            <!-- Interactive Tags -->
+                            <div class="flex flex-wrap justify-center gap-4">
+                                <!-- Added transition and hover classes back directly to ensure visual feedback -->
+                                <div class="skill-tag bg-gray-800/70 text-yellow-300 p-3 rounded-full font-semibold transition duration-300" data-skill-set="Architecture">Architectural CAD & BIM</div>
+                                <div class="skill-tag bg-gray-800/70 text-yellow-300 p-3 rounded-full font-semibold transition duration-300" data-skill-set="Design">Space Planning & Materials</div>
+                                <div class="skill-tag bg-gray-800/70 text-yellow-300 p-3 rounded-full font-semibold transition duration-300" data-skill-set="Business">Financial Modeling & Strategy</div>
+                                <div class="skill-tag bg-gray-800/70 text-yellow-300 p-3 rounded-full font-semibold transition duration-300" data-skill-set="Web">Tailwind & Responsive UI/UX</div>
+                                <div class="skill-tag bg-gray-800/70 text-yellow-300 p-3 rounded-full font-semibold transition duration-300" data-skill-set="Tech">Arduino Microcontrollers</div>
+                                <div class="skill-tag bg-gray-800/70 text-yellow-300 p-3 rounded-full font-semibold transition duration-300" data-skill-set="Law">Fiqh & Ethical Frameworks</div>
+                            </div>
+                            
+                            <!-- Detailed Skill Display -->
+                            <div id="skill-detail" class="glass-card rounded-xl p-6 mt-8 text-left transition duration-500 min-h-[150px]">
+                                <h3 class="elegant-heading text-2xl font-bold text-yellow-300 mb-2">Select a domain above to see the mastery scope...</h3>
+                                <ul id="skill-list" class="list-disc list-inside text-gray-300 text-base space-y-1"></ul>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'blog':
+                    htmlContent = `
+                        <div class="glass-card rounded-xl p-6 md:p-10 w-full max-w-4xl mx-auto text-center">
+                            <h2 class="elegant-heading text-4xl font-bold text-yellow-300 border-b border-gray-700 pb-2 mb-6">The Nexus: Thoughts on Design & Tech</h2>
+                            <p class="text-lg mb-8 text-gray-300">A space for sharing insights on the intersection of architecture, code, and ethical business strategy.</p>
+
+                            <div class="space-y-6 text-left">
+                                <!-- Placeholder Blog Post 1 -->
+                                <div class="p-4 bg-gray-900/50 rounded-lg border border-gray-700 hover:border-yellow-500 transition">
+                                    <h3 class="font-bold text-xl text-yellow-400">The Future of Sustainable Housing: A Parametric Approach</h3>
+                                    <p class="text-sm text-gray-500">October 21, 2025 | Category: Architecture & Tech</p>
+                                    <p class="mt-2 text-gray-300">Examining how code-driven design (Parametrics) can solve complex challenges in material waste and energy consumption for the next generation of homes.</p>
+                                </div>
+
+                                <!-- Placeholder Blog Post 2 -->
+                                <div class="p-4 bg-gray-900/50 rounded-lg border border-gray-700 hover:border-yellow-500 transition">
+                                    <h3 class="font-bold text-xl text-yellow-400">From Sketch to Signal: Prototyping IoT in Interior Design</h3>
+                                    <p class="text-sm text-gray-500">September 15, 2025 | Category: Interior Design & Tech</p>
+                                    <p class="mt-2 text-gray-300">A deep dive into using Arduino for creating smart, responsive lighting and climate control systems that are seamlessly integrated into the physical space.</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'contact':
+                    htmlContent = `
+                        <div class="glass-card rounded-xl p-6 md:p-10 w-full max-w-5xl mx-auto text-center">
+                            <h2 class="elegant-heading text-4xl font-bold text-yellow-300 border-b border-gray-700 pb-2 mb-6">Initiate Secure Connection</h2>
+                            
+                            <!-- Interactive Contact Icons -->
+                            <div class="flex justify-center flex-wrap gap-8 text-4xl mb-8">
+                                <a href="mailto:honeyrich810@gmail.com" class="social-icon text-yellow-400 hover:text-yellow-200 transition" aria-label="Email Contact">
+                                    <i class="fa-solid fa-envelope"></i><p class="text-sm mt-1">Email</p>
+                                </a>
+                                <a href="https://github.com/Riri-11/" target="_blank" class="social-icon text-gray-400 hover:text-white transition" aria-label="GitHub Profile">
+                                    <i class="fab fa-github"></i><p class="text-sm mt-1">GitHub</p>
+                                </a>
+                                <a href="https://www.instagram.com/_r.ihan.a_?igsh=bmRmYThnaWhvNHRr&utm_source=qr" target="_blank" class="social-icon text-pink-400 hover:text-pink-300 transition" aria-label="Instagram Profile">
+                                    <i class="fab fa-instagram"></i><p class="text-sm mt-1">Instagram</p>
+                                </a>
+                                <a href="https://t.me/already_done" target="_blank" class="social-icon text-blue-400 hover:text-blue-300 transition" aria-label="Telegram Profile">
+                                    <i class="fab fa-telegram-plane"></i><p class="text-sm mt-1">Telegram</p>
+                                </a>
+                                <a href="https://www.tiktok.com/@dailydoseof_rihu" target="_blank" class="social-icon transition" aria-label="TikTok Profile">
+                                    <i class="fab fa-tiktok text-gray-400 hover:text-yellow-500"></i><p class="text-sm mt-1">TikTok</p>
+                                </a>
+                            </div>
+
+                            <!-- Map Placeholder FIX: More thematic/prominent placeholder -->
+                            <h3 class="elegant-heading text-2xl font-bold text-yellow-300 border-t border-gray-800 pt-6 mt-6 mb-4">Connect Globally</h3>
+                      
+
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15781.166162125585!2d38.80214309871168!3d8.930462002167904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b9d0337b5f257%3A0xc34857b8535492d!2sKilinto!5e0!3m2!1sen!2sus!4v1700200000000!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+                            <p class="text-sm text-gray-500 mt-2">I am currently located in East Africa, open to global collaboration.</p>
+                        </div>
+                    `;
+                    break;
+            }
+            contentArea.innerHTML = htmlContent;
+            
+            // Re-attach event listeners after content is rendered
+            if (page === 'skills') attachSkillListeners();
+            if (page === 'projects') attachProjectListeners();
+        }
+        
+        // ===============================================
+        // 2. INTERACTIVE JS LISTENERS
+        // ===============================================
+
+        function attachProjectListeners() {
+            const projectItems = document.querySelectorAll('.project-item');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button styling
+                    filterButtons.forEach(b => {
+                        b.classList.remove('bg-yellow-600', 'text-black');
+                        b.classList.add('bg-gray-700', 'hover:bg-yellow-700');
+                    });
+                    this.classList.add('bg-yellow-600', 'text-black');
+                    this.classList.remove('bg-gray-700', 'hover:bg-yellow-700');
+                    
+                    // Filter logic
+                    projectItems.forEach(item => {
+                        const domain = item.getAttribute('data-domain');
+                        // Use block/none display for filtering
+                        item.style.display = (filter === 'All' || domain === filter) ? 'block' : 'none';
+                    });
+                });
+            });
+        }
+
+        function attachSkillListeners() {
+            const skillTags = document.querySelectorAll('.skill-tag');
+            const skillDetailTitle = document.querySelector('#skill-detail h3');
+            const skillList = document.getElementById('skill-list');
+            
+            const skillData = {
+                "Architecture": { title: "Architectural CAD & BIM Mastery", list: ["AutoCAD & Revit proficiency", "Sustainable Site Planning", "Structural Concept Modeling"] },
+                "Design": { title: "Space Planning & Materials Science", list: ["Interior Lighting Theory", "Ergonomics and Flow Design", "Material Palette Selection and Budgeting"] },
+                "Business": { title: "Financial Modeling & Strategy", list: ["Market Trend Analysis", "Resource Allocation Planning", "Basic Accounting Principles"] },
+                "Web": { title: "Tailwind & Responsive UI/UX", list: ["HTML5 Structure and Semantics", "Modern JavaScript (ES6+)", "Mobile-First Design Strategy"] },
+                "Tech": { title: "Arduino Microcontrollers Prototyping", list: ["Sensor Interfacing (Temp, Light)", "Basic C++ Programming for Microcontrollers", "IoT Concept Prototyping"] },
+                "Law": { title: "Fiqh & Ethical Frameworks", list: ["Comparative Jurisprudence research", "Ethical Business Model Analysis", "Foundational Sharia principles"] }
+            };
+
+            const handleSkillInteraction = (event) => {
+                // Ensure event.currentTarget is the element with data-skill-set
+                const skillSet = event.currentTarget.getAttribute('data-skill-set');
+                const data = skillData[skillSet];
+                if (data) {
+                    skillDetailTitle.textContent = data.title;
+                    skillList.innerHTML = data.list.map(item => `<li>${item}</li>`).join('');
+                }
+            };
+
+            skillTags.forEach(tag => {
+                // IMPORTANT FIX: Re-attaching listeners correctly for both hover and click (for touch)
+                tag.addEventListener('mouseover', handleSkillInteraction);
+                tag.addEventListener('click', handleSkillInteraction);
+            });
+            
+            // Set initial content if none is selected
+            skillDetailTitle.textContent = "Select a domain above to see the mastery scope...";
+            skillList.innerHTML = '';
+        }
+
+
+        // ===============================================
+        // 3. 3D RENDER SETUP (Architectural Prism) - DEBUGGED
+        // ===============================================
+
+        function init3D() {
+            // SCENE SETUP
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            // Use WebGLRenderer with alpha for transparency over body background
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0); 
+            document.body.appendChild(renderer.domElement);
+            renderer.setPixelRatio(window.devicePixelRatio); 
+
+            // GEOMETRY: Hexagonal Prism (Architectural Sketch theme) - CHANGED FROM ICOSAHEDRON
+            // CylinderGeometry(radiusTop, radiusBottom, height, radialSegments)
+            const geometry = new THREE.CylinderGeometry(1.2, 1.2, 4, 6); 
+            
+            // MATERIAL: Wireframe Glass (Gold/Yellow color)
+            const initialMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xD4AF37, // Gold Color
+                wireframe: true, 
+                opacity: 0.25, // Increased opacity slightly for visibility
+                transparent: true,
+                roughness: 0.1,
+                metalness: 0.8,
+            });
+
+            // PRISM MESH
+            prism = new THREE.Mesh(geometry, initialMaterial);
+            // Initial position and rotation
+            prism.rotation.x = 0.5;
+            prism.rotation.y = 0.5;
+            scene.add(prism);
+
+            // LIGHTING: Multiple subtle lights 
+            scene.add(new THREE.AmbientLight(0x404040, 3));
+            
+            const pointLight1 = new THREE.PointLight(0xFFD700, 5, 100); 
+            pointLight1.position.set(5, 5, 5);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0x8A2BE2, 3, 100); 
+            pointLight2.position.set(-5, -5, -5);
+            scene.add(pointLight2);
+
+
+            camera.position.z = 4.5; // Moved camera back to see the larger prism
+
+            // EVENT LISTENERS
+            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('mousemove', onDocumentMouseMove, false);
+            
+            // Initialize user data for rotation
+            prism.userData.autoRotateSpeed = 0.003;
+            
+            // Start the animation loop
+            animate(); 
+        }
+
+        function onWindowResize() {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onDocumentMouseMove(event) {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            // Automatic gentle rotation
+            const speed = prism.userData.autoRotateSpeed || 0.003;
+            prism.rotation.x += speed * delta * 60 * 0.5; // Slower X rotation
+            prism.rotation.y += speed * delta * 60; 
+            prism.rotation.z += speed * delta * 60 * 0.2; // Very slow Z rotation
+
+            // Mouse-controlled rotation (smooth dampening)
+            const targetRotationX = -mouseY * 0.0003;
+            const targetRotationY = -mouseX * 0.0003;
+
+            prism.rotation.x += (targetRotationX - prism.rotation.x) * 0.05;
+            prism.rotation.y += (targetRotationY - prism.rotation.y) * 0.05;
+
+            renderer.render(scene, camera);
+        }
+
+        // Start everything when the window loads
+        window.onload = function() {
+            init3D();
+            navigateTo('home');
+        };
+    </script>
+</body>
+</html>
